@@ -2,24 +2,22 @@
    "name": "discord24",
    "version": "1.0.0",
    "description": "a 24 bot for discord",
-   "main": "main.js",
    "dependencies": {
-      "discord.io": "github:woor/discord.io#gateway_v6",
+      "discord.js": "^14.25.1",
       "jsonfile": "^3.0.1"
    },
-   "devDependencies": {},
    "scripts": {
-      "start": "node src/main.js",
+      "start": "node src/bot.js",
       "test": "echo \"Error: no test specified\" && exit 1"
    },
    "repository": {
       "type": "git",
-      "url": "git+https://github.com/thepiercingarrow/discord24.git"
+      "url": "git+https://github.com/mzhaodev/discord24.git"
    },
    "author": "Maxwell Zhao",
    "license": "MIT",
    "bugs": {
-      "url": "https://github.com/thepiercingarrow/discord24/issues"
+      "url": "https://github.com/mzhaodev/discord24/issues"
    },
-   "homepage": "https://github.com/thepiercingarrow/discord24#readme"
+   "homepage": "https://github.com/mzhaodev/discord24#readme"
 }
