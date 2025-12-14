@@ -1,0 +1,14 @@
+[Unit]
+Description=Discord 24
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/bots/discord24/ # path to repo goes here
+ExecStart=npm start
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
