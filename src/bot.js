@@ -15,6 +15,11 @@ client.on('clientReady', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
+function getCurrentCardSetAsString() {
+  return JSON.stringify(game.currentSet.sort(
+      (a, b) => game.getCardValue(a) - game.getCardValue(b)));
+}
+
 client.on('messageCreate', message => {
   if (message.author.bot) return;
 
@@ -35,20 +40,13 @@ client.on('messageCreate', message => {
             game.pcalc(solution.substring(4).trim(), false)}\``);
         return;
       case 'show':
-        message.channel.send(
-            'Set: `' +
-            JSON.stringify(game.currentSet.sort(
-                (a, b) =>
-                    (game.cardset.indexOf(a) - game.cardset.indexOf(b)))) +
-            '`');
+        message.channel.send('Set: `' + getCurrentCardSetAsString() + '`');
         return;
       case 'skip':
         const ans = game.solve(game.currentSet);
         game.newSet();
         message.channel.send(`Skipped! Solution was: \`${ans}\`. New set: \`${
-            JSON.stringify(game.currentSet.sort(
-                (a, b) =>
-                    (game.cardset.indexOf(a) - game.cardset.indexOf(b))))}\``);
+            getCurrentCardSetAsString()}\``);
         return;
       case 'solv':
         const expr = solution.substring(4).trim();
@@ -81,9 +79,7 @@ client.on('messageCreate', message => {
       game.newSet();
       message.channel.send(`<@!${uid}> is correct! Points: ${
           game.scores.count[uid].points}. New set: \`${
-          JSON.stringify(game.currentSet.sort(
-              (a, b) =>
-                  (game.cardset.indexOf(a) - game.cardset.indexOf(b))))}\``);
+          getCurrentCardSetAsString()}\``);
     }
   }
 });

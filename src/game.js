@@ -20,6 +20,14 @@ function validJSON(str) {
 }
 
 function solve(sset) {
+  const newSset = sset.map(val => {
+    const numericValue = getCardValue(val)
+    if (numericValue >= 1 && numericValue <= 13) {
+      return cardset[numericValue - 1];
+    }
+    return val;
+  });
+
   function ssolve(curexp, unused, nums) {
     if (unused.length == 0) {
       if (Math.abs(pcalc(curexp, true) - 24) < Math.pow(10, -8)) return curexp;
@@ -37,7 +45,7 @@ function solve(sset) {
     return undefined;
   }
   function makeops(ops) {
-    if (ops.length == 3) return ssolve('', sset.concat(ops.split('')), 0);
+    if (ops.length == 3) return ssolve('', newSset.concat(ops.split('')), 0);
     for (var i = 0; i < operators.length; ++i) {
       solution = makeops(ops + operators[i]);
       if (solution != undefined) return solution;
@@ -47,14 +55,14 @@ function solve(sset) {
   return makeops('');
 }
 
-function pcalc(exp, fourfunc) {
+function pcalc(expr, fourfunc) {
   function fact(a) {
     return a < 2 ? 1 : a * fact(a - 1);
   }
   var stack = [];
-  for (var i in exp) {
+  for (var i in expr) {
     if (!fourfunc) {
-      switch (exp[i]) {
+      switch (expr[i]) {
         case '!':
           if (stack.length < 1) return undefined;
           stack.push(fact(stack.pop()));
@@ -66,7 +74,7 @@ function pcalc(exp, fourfunc) {
           continue;
       }
     }
-    switch (exp[i]) {
+    switch (expr[i]) {
       case '+':
         if (stack.length < 2) return undefined;
         stack.push(stack.pop() + stack.pop());
@@ -86,7 +94,7 @@ function pcalc(exp, fourfunc) {
         stack.push(stack.pop() / a);
         break;
       default:
-        stack.push(cardset.indexOf(exp[i]) + 1);
+        stack.push(getCardValue(expr[i]));
         break;
     }
   }
@@ -94,17 +102,57 @@ function pcalc(exp, fourfunc) {
   return stack[0];
 }
 
-function valid(exp) {
-  var unused = set.slice();
-  for (var i in exp) {
-    if (unused.indexOf(exp[i]) > -1)
-      unused.splice(unused.indexOf(exp[i]), 1);
-    else if (['+', ' ', '-', '/', '*'].indexOf(exp[i]) > -1)
-      continue;
-    else
-      return false;
+function getCardAliases(card) {
+  const upperCaseCard = String(card).toUpperCase();
+  const numericValue = getCardValue(upperCaseCard);
+  return [upperCaseCard, upperCaseCard.toLowerCase(), String(numericValue)];
+}
+
+function isValidOperator(char) {
+  return operators.includes(char);
+}
+
+function isPotentialCardAlias(alias) {
+  const numericValue = parseInt(alias, 10);
+  if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 13) {
+    return true;
   }
-  return unused.length == 0;
+  return cardset.map(c => c.toLowerCase())
+      .includes(String(alias).toLowerCase());
+}
+
+function valid(expr) {
+  let tempUnused = [...set];
+
+  for (const char of expr) {
+    if (isValidOperator(char)) {
+      continue;
+    }
+
+    if (isPotentialCardAlias(char)) {
+      const numericValue = getCardValue(char);
+      const standardizedCard = cardset[numericValue - 1];
+
+      const indexInUnused = tempUnused.indexOf(standardizedCard);
+      if (indexInUnused > -1) {
+        tempUnused.splice(indexInUnused, 1);
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  return tempUnused.length === 0;
+}
+
+function getCardValue(card) {
+  const numericValue = parseInt(card, 10);
+  if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 13) {
+    return numericValue;
+  }
+  return cardset.indexOf(String(card).toUpperCase()) + 1;
 }
 
 function newSet() {
@@ -131,5 +179,6 @@ module.exports = {
   pcalc : pcalc,
   valid : valid,
   savescores : savescores,
-  validJSON : validJSON
+  validJSON : validJSON,
+  getCardValue : getCardValue
 };
