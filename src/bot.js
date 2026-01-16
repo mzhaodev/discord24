@@ -56,10 +56,11 @@ client.on('messageCreate', message => {
                  'Invalid format. Please use 24/solv["A","2","3","4"] (the quotes are optional for the arabic numerals).')}\``);
         return;
       case 'scor':
+        const scores = game.loadScores();
         message.channel.send(
             '```' +
-            Object.keys(game.scores.count)
-                .map(uid => game.scores.count[uid])
+            Object.keys(scores.count)
+                .map(uid => scores.count[uid])
                 .sort((a, b) => (b.points - a.points))
                 .map(a => (a.nick + ': ' + a.points))
                 .join('\n') +
@@ -67,18 +68,19 @@ client.on('messageCreate', message => {
         return;
     }
 
-    if (game.valid(solution) &&
+    if (game.isValidSolutionCandidate(solution) &&
         Math.abs(game.pcalc(solution, true) - 24) < Math.pow(10, -8)) {
-      if (game.scores.count[uid] != undefined) {
-        game.scores.count[uid].nick = user.username;
-        ++game.scores.count[uid].points;
+      const scores = game.loadScores();
+      if (scores.count[uid] != undefined) {
+        scores.count[uid].nick = user.username;
+        ++scores.count[uid].points;
       } else {
-        game.scores.count[uid] = {nick: user.username, points: 1};
+        scores.count[uid] = {nick: user.username, points: 1};
       }
-      game.savescores();
+      game.savescores(scores);
       game.newSet();
       message.channel.send(`<@!${uid}> is correct! Points: ${
-          game.scores.count[uid].points}. New set: \`${
+          scores.count[uid].points}. New set: \`${
           getCurrentCardSetAsString()}\``);
     }
   }

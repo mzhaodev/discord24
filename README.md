@@ -9,7 +9,7 @@ npm install
 ```
 
 Move/copy `config.json.template` to `config.json`, and edit in your bot token.  
-Move/copy `scores.json.DO_NOT_EDIT` to `scores.json`.
+`scores.json` will be created automatically when a user first scores.
 
 ### Run
 

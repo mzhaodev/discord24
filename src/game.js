@@ -1,7 +1,7 @@
 
 var jsonfile = require('jsonfile');
 
-var scores = require('../scores.json');
+
 
 var cardset = ['A', '2', '3', '4', '5', '6', '7', '8', '9', 'X', 'J', 'Q', 'K'];
 
@@ -102,17 +102,11 @@ function pcalc(expr, fourfunc) {
   return stack[0];
 }
 
-function getCardAliases(card) {
-  const upperCaseCard = String(card).toUpperCase();
-  const numericValue = getCardValue(upperCaseCard);
-  return [upperCaseCard, upperCaseCard.toLowerCase(), String(numericValue)];
-}
-
 function isValidOperator(char) {
   return operators.includes(char);
 }
 
-function isPotentialCardAlias(alias) {
+function isValidCardAlias(alias) {
   const numericValue = parseInt(alias, 10);
   if (!isNaN(numericValue) && numericValue >= 1 && numericValue <= 13) {
     return true;
@@ -121,7 +115,7 @@ function isPotentialCardAlias(alias) {
       .includes(String(alias).toLowerCase());
 }
 
-function valid(expr) {
+function isValidSolutionCandidate(expr) {
   let tempUnused = [...set];
 
   for (const char of expr) {
@@ -129,7 +123,7 @@ function valid(expr) {
       continue;
     }
 
-    if (isPotentialCardAlias(char)) {
+    if (isValidCardAlias(char)) {
       const numericValue = getCardValue(char);
       const standardizedCard = cardset[numericValue - 1];
 
@@ -161,23 +155,29 @@ function newSet() {
   if (solve(set) == undefined) newSet();
 }
 
-function savescores() {
+function loadScores() {
+  try {
+    return jsonfile.readFileSync(__dirname + '/../scores.json');
+  } catch (e) {
+    return { count: {} };
+  }
+}
+
+function savescores(scores) {
   jsonfile.writeFile(__dirname + '/../scores.json', scores, function(e) {
     if (e != null) console.error('Error saving scores: ' + e);
   });
 }
 
 module.exports = {
-  scores : scores,
-  cardset : cardset,
-  set : set,
       get currentSet() {
         return set;
       },
   newSet : newSet,
   solve : solve,
   pcalc : pcalc,
-  valid : valid,
+  isValidSolutionCandidate : isValidSolutionCandidate,
+  loadScores : loadScores,
   savescores : savescores,
   validJSON : validJSON,
   getCardValue : getCardValue
